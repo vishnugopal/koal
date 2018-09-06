@@ -5,5 +5,5 @@ Rails.application.routes.draw do
   resources :stories
   resources :authors
 
-  root to: 'stories#index'
+  root to: 'stories#show'
 end
