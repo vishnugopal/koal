@@ -10,6 +10,7 @@
     "turbolinks": "^5.2.0"
   },
   "devDependencies": {
+    "tailwindcss": "^0.6.5",
     "webpack-dev-server": "2.11.2"
   }
 }
