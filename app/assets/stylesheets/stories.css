@@ -1,10 +1,25 @@
-/*
-  Place all the styles related to the matching controller here.
-  They will automatically be included in application.css.
-*/
-
 @import "./application.css";
 
-.header {
-  @apply .bg-indigo;
+body {
+  @apply .font-sans .bg-black .text-grey-dark .antialiased;
+}
+
+p {
+  @apply .mb-5;
+}
+
+h3 + p:first-line {
+  @apply .uppercase .text-xl;
+}
+
+h3 + p::first-letter {
+  @apply .mt-0 .mr-0 float-left .text-3xl .font-bold .leading-none;
+}
+
+a {
+  @apply .font-normal .no-underline .text-lg .text-grey-darker;
+}
+
+a:hover {
+  @apply .text-grey .border-grey;
 }
