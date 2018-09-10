@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_03_060620) do
+ActiveRecord::Schema.define(version: 2018_09_10_064147) do
 
   create_table "authors", force: :cascade do |t|
     t.string "name"
@@ -19,11 +19,12 @@ ActiveRecord::Schema.define(version: 2018_09_03_060620) do
   end
 
   create_table "chapters", force: :cascade do |t|
-    t.string "name"
-    t.string "number"
+    t.string "title"
+    t.string "order"
     t.integer "story_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "contents"
     t.index ["story_id"], name: "index_chapters_on_story_id"
   end
 
@@ -32,6 +33,8 @@ ActiveRecord::Schema.define(version: 2018_09_03_060620) do
     t.integer "author_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "intro"
+    t.string "copyright_notice"
     t.index ["author_id"], name: "index_stories_on_author_id"
   end
 
