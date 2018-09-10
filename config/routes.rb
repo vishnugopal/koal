@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  resources :chapters
-  resources :stories
-  resources :authors
+  get ":id-:story_title", to: "stories#show", constraints: {id: /\d{1,}/}
 
-  root to: 'stories#show'
+  root to: "stories#index"
 end
