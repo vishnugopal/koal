@@ -20,6 +20,7 @@ class Story < ApplicationRecord
     intro_text_header = cover_doc.css(".end-note + h4")[0].inner_html
     intro_text = cover_doc.css("h4 + blockquote").inner_html.strip
     intro_text = "<h4>#{intro_text_header}</h4>#{intro_text}"
+    story_description = cover_doc.css(".end-note p")[0].inner_text.gsub(/^Description:/, "")
 
     story_name = index_doc.css("h3")[0].inner_html
     author_text = index_doc.css("h3 + h4")[0].inner_html.gsub(/^by /, "")
@@ -42,6 +43,7 @@ class Story < ApplicationRecord
     author = Author.find_or_create_by(name: author_text)
     story = author.stories.find_by_name(story_name)
     story ||= author.stories.create(name: story_name,
+                                    description: story_description,
                                     intro: intro_text,
                                     copyright_notice: copyright_notice)
 

@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 2018_09_10_064147) do
     t.datetime "updated_at", null: false
     t.text "intro"
     t.string "copyright_notice"
+    t.string "description"
     t.index ["author_id"], name: "index_stories_on_author_id"
   end
 

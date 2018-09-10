@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Koal</title>
+    <title>Koal<%= content_for(:title) ? " » #{yield :title}" : "" %></title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <% if content_for(:description) -%>
+      <meta name="description" content="<%= yield :description %>" />
+    <% end -%>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
