@@ -57,4 +57,8 @@ class Story < ApplicationRecord
       chapter.save
     end
   end
+
+  def slug
+    name.parameterize
+  end
 end
