@@ -20,10 +20,12 @@ class Story < ApplicationRecord
     intro_text = cover_doc.css("h4 + blockquote").inner_html.strip
     intro_text = "<h4>#{intro_text_header}</h4>#{intro_text}"
 
+    author_text = index_doc.css("h3 + h4")[0].inner_html.gsub(/^by /, "")
+    copyright_notice = index_doc.css("h4 + h4")[0].inner_html
+
     chapter_files = index_doc.css("small a").collect do |link|
       File.join(folder, link["href"])
     end
-
     chapter_contents = {}
     chapter_files.each do |chapter_file|
       chapter_doc = File.open(chapter_file) { |f| Nokogiri::HTML(f) }
