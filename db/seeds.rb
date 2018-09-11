@@ -11,6 +11,7 @@ home_folder = `cd ~; pwd`.strip
 stories = [
   "Santos_J_Romeo@Adventures_of_Me_and_Martha_Jane",
   "gwresearch@Magestic",
+  "Blackie@The_Book",
 ]
 
 stories.each do |story|
