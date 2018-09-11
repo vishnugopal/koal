@@ -7,11 +7,19 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 home_folder = `cd ~; pwd`.strip
-seed_data_folder = File.join(home_folder, "Downloads", "Santos_J_Romeo@Adventures_of_Me_and_Martha_Jane")
 
-if Dir.exist? seed_data_folder
-  Story.load_from_file(folder: seed_data_folder, source_type: :storiesonline, source_format: :html)
-else
-  puts "Seed data directory does not exist. Download SJR's Me & Martha Jane, unzip & put it in ~/Downloads"
-  exit 1
+stories = [
+  "Santos_J_Romeo@Adventures_of_Me_and_Martha_Jane",
+  "gwresearch@Magestic",
+]
+
+stories.each do |story|
+  seed_data_folder = File.join(home_folder, "Downloads", story)
+
+  if Dir.exist? seed_data_folder
+    Story.load_from_file(folder: seed_data_folder, source_type: :storiesonline, source_format: :html)
+  else
+    puts "Seed data directory does not exist. Download appropriate stories, unzip & put it in ~/Downloads"
+    exit 1
+  end
 end

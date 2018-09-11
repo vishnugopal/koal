@@ -17,9 +17,13 @@ class Story < ApplicationRecord
     cover_doc = File.open(cover_file) { |f| Nokogiri::HTML(f) }
     index_doc = File.open(index_file) { |f| Nokogiri::HTML(f) }
 
-    intro_text_header = cover_doc.css(".end-note + h4")[0].inner_html
-    intro_text = cover_doc.css("h4 + blockquote").inner_html.strip
-    intro_text = "<h4>#{intro_text_header}</h4>#{intro_text}"
+    intro_text = nil
+    intro_text_header = cover_doc.css(".end-note + h4")[0]&.inner_html
+    if intro_text_header
+      intro_text = cover_doc.css("h4 + blockquote").inner_html.strip
+      intro_text = "<h4>#{intro_text_header}</h4>#{intro_text}"
+    end
+
     story_description = cover_doc.css(".end-note p")[0].inner_text.gsub(/^Description:/, "")
 
     story_name = index_doc.css("h3")[0].inner_html

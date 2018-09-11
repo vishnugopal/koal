@@ -4,7 +4,7 @@
 
 <header class="flex flex-row mb-6 mt-6">
   <div class="flex-none w-8 m-5">
-    <img class="max-w-full max-h-full" src="<%= asset_pack_path 'images/logo.png' %>" />
+    <a href="<%= root_path %>"><img class="max-w-full max-h-full" src="<%= asset_pack_path 'images/logo.png' %>" /></a>
   </div>
   <div class="flex-1 mt-6 mr-2">
     <nav><a href="" rel="author"><%= @story.author.name %>'s Stories</a></nav>
@@ -13,7 +13,7 @@
 </header>
 
 <div class="container lg:w-3/5 md:w-4/5 mx-auto px-4 leading-normal text-xl">
-<% if @chapter.first? -%>
+<% if @chapter.first? && @story.intro -%>
   <blockquote class="mx-10 mb-20 mt-20">
     <%= @story.intro.html_safe %>
   </blockquote>
@@ -29,8 +29,8 @@
     <% unless @chapter.first? -%>
     <a class="inline-block" href="<%= story_path(id: @story.id, slug: @story.slug, chapter_order: @chapter.order - 1) %>">Previous Chapter</a>
     <% end -%>
+    <% unless @chapter.first? || @chapter.last? -%>|<% end -%>
     <% unless @chapter.last? -%>
-    |
     <a class="inline-block" href="<%= story_path(id: @story.id, slug: @story.slug, chapter_order: @chapter.order + 1) %>">Next Chapter</a>
     <% end -%>
   </nav>

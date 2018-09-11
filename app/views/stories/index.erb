@@ -1,0 +1,38 @@
+<% content_for :title do -%>
+The best of amateur writing in one beautiful, mobile-friendly website.
+<% end -%>
+<% content_for :description do -%>
+Koal curates over <%= Story.count %> stories (from <%= Author.count %> authors) — amateur writing from all across the internet and presents it in a readable, mobile-friendly form.
+<% end -%>
+
+<header class="container  mt-12 leading-normal">
+  <div class="w-12 m-5 ml-8 mr-8">
+    <a href="<%= root_path %>"><img class="max-w-full max-h-full" src="<%= asset_pack_path 'images/logo.png' %>" /></a>
+   </div>
+  <h1 class="m-5 ml-8 mr-8 text-4xl mt-10 mx-auto">Koal</h1>
+  <p class="m-5 ml-8 mr-8 text-2xl mx-auto">The best of amateur writing in one beautiful, mobile-friendly website.</p>
+  <p class="m-5 ml-8 mr-8 text-xl mx-auto">All stories here are curated, “best of the best” collections from years of reading amateur fiction from the nooks & corners of the internet. Many stories are now hard to find & only available on obscure sites or newsgroups, or behind paywalls. This is an effort to consolidate all of them in a single place, and also build a beautiful reading experience to enjoy these timeless words.</p>
+</header>
+
+<div class="container lg:w-3/5 md:w-4/5 mx-auto px-8 leading-normal text-xl">
+<h2 class="mt-10 mb-5">Stories</h2>
+<ul class="list-reset">
+<% Story.all.each do |story| -%>
+<li>
+  <h4 class="mb-2"><%= story.name %> by <%= story.author.name %></h4>
+  <p><%= story.description %></p>
+  <a href="<%= story_path(id: story.id, slug: story.slug) %>" class="bg-grey-light inline-block p-2 hover:bg-grey-lighter text-grey-darkest hover:text-grey-darkest">Read</a>
+</li>
+
+<% unless story == Story.last -%>
+<hr class="border-grey-darkest border-t mt-10 mb-10" />
+<% end -%>
+
+<% end -%>
+</ul>
+</div>
+
+
+<footer class="container flex mx-auto px-4 mb-24 mt-10 leading-normal border-grey-darkest pt-6 border-t">
+  <p class="w-auto">Copyright &copy; Vishnu Gopal. All stories belong to their respective authors and are reproduced here with permission.</p>
+</footer>
