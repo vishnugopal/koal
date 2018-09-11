@@ -5,7 +5,7 @@ The best of amateur writing in one beautiful, mobile-friendly website.
 Koal curates over <%= Story.count %> stories (from <%= Author.count %> authors) — amateur writing from all across the internet and presents it in a readable, mobile-friendly form.
 <% end -%>
 
-<header class="container  mt-12 leading-normal">
+<header class="container mx-auto mt-12 leading-normal">
   <div class="w-12 m-5 ml-8 mr-8">
     <a href="<%= root_path %>"><img class="max-w-full max-h-full" src="<%= asset_pack_path 'images/logo.png' %>" /></a>
    </div>
@@ -19,7 +19,7 @@ Koal curates over <%= Story.count %> stories (from <%= Author.count %> authors) 
 <ul class="list-reset">
 <% Story.all.each do |story| -%>
 <li>
-  <h4 class="mb-2"><%= story.name %> by <%= story.author.name %></h4>
+  <h4 class="mb-2 text-2xl"><%= story.name %> by <%= story.author.name %></h4>
   <p><%= story.description %></p>
   <a href="<%= story_path(id: story.id, slug: story.slug) %>" class="bg-grey-light inline-block p-2 hover:bg-grey-lighter text-grey-darkest hover:text-grey-darkest">Read</a>
 </li>
