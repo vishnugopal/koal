@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 2018_09_10_064147) do
 
   create_table "chapters", force: :cascade do |t|
     t.string "title"
-    t.string "order"
+    t.integer "order"
     t.integer "story_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
