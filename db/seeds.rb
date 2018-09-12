@@ -18,7 +18,7 @@ stories.each do |story|
   seed_data_folder = File.join(home_folder, "Downloads", story)
 
   if Dir.exist? seed_data_folder
-    Story.load_from_file(folder: seed_data_folder, source_type: :storiesonline, source_format: :html)
+    Story.load_from_folder(folder: seed_data_folder, source_type: :storiesonline, source_format: :html)
   else
     puts "Seed data directory does not exist. Download appropriate stories, unzip & put it in ~/Downloads"
     exit 1

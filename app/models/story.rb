@@ -7,7 +7,16 @@ class Story < ApplicationRecord
   belongs_to :author
   has_many :chapters
 
-  def self.load_from_file(folder:, source_type:, source_format:)
+  def self.load_from_zipfile(zipfile:, source_type:, source_format:)
+    Dir.mktmpdir do |temp_directory|
+      system("unzip #{zipfile} -d #{temp_directory}")
+      story_folder = File.join(temp_directory, File.basename(zipfile, File.extname(zipfile)))
+      load_from_folder(folder: story_folder, source_type: source_type,
+                       source_format: source_format)
+    end
+  end
+
+  def self.load_from_folder(folder:, source_type:, source_format:)
     raise ArgumentError unless source_type == :storiesonline
     raise ArgumentError unless source_format == :html
 
