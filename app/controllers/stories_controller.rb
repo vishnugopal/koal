@@ -10,16 +10,19 @@ class StoriesController < ApplicationController
     zipfile_name = zipfile.original_filename
     zipfile_path = zipfile.tempfile.to_path
 
-    Story.load_from_zipfile(zipfile: zipfile_path,
-                            source_type: :storiesonline,
-                            source_format: :html,
-                            story_file_name: zipfile_name)
-
-    flash.notice = "Story successfully created"
-    flash.discard
-  rescue Exception => e
-    logger.debug e.inspect.to_s
-    flash.alert = "Story creation failed!"
+    upload_service = StoryServices::UnzipUpload.call(zipfile: zipfile_path,
+                                                     story_file_name: zipfile_name)
+    if upload_service.success?
+      import_service = StoryServices::ImportFolder.call(folder: upload_service.story_folder,
+                                                        source_type: :storiesonline,
+                                                        source_format: :html,
+                                                        remove_folder_after_import: true)
+      if import_service.success?
+        flash.notice = "Story successfully created"
+      else
+        flash.alert = "Story creation failed!"
+      end
+    end
     flash.discard
   ensure
     @story = Story.new

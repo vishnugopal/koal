@@ -18,9 +18,15 @@ stories.each do |story|
   seed_data_folder = File.join(home_folder, "Downloads", story)
 
   if Dir.exist? seed_data_folder
-    Story.load_from_folder(folder: seed_data_folder, source_type: :storiesonline, source_format: :html)
+    import_service = StoryServices::ImportFolder.call(folder: seed_data_folder,
+                                                      source_type: :storiesonline,
+                                                      source_format: :html)
+    unless import_service.success?
+      STDERR.puts "Import failed, are you sure the format is correct?"
+      STDERR.puts import_service.exception.inspect.to_s
+    end
   else
-    puts "Seed data directory does not exist. Download appropriate stories, unzip & put it in ~/Downloads"
+    STDERR.puts "Seed data directory does not exist. Download appropriate stories, unzip & put it in ~/Downloads"
     exit 1
   end
 end
