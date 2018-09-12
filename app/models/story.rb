@@ -7,10 +7,18 @@ class Story < ApplicationRecord
   belongs_to :author
   has_many :chapters
 
-  def self.load_from_zipfile(zipfile:, source_type:, source_format:)
+  def self.load_from_zipfile(zipfile:, source_type:, source_format:, story_file_name: nil)
     Dir.mktmpdir do |temp_directory|
       system("unzip #{zipfile} -d #{temp_directory}")
-      story_folder = File.join(temp_directory, File.basename(zipfile, File.extname(zipfile)))
+
+      logger.info story_file_name
+
+      story_file_name = if story_file_name
+                          File.basename(story_file_name, File.extname(story_file_name))
+                        else
+                          File.basename(zipfile, File.extname(zipfile))
+                        end
+      story_folder = File.join(temp_directory, story_file_name)
       load_from_folder(folder: story_folder, source_type: source_type,
                        source_format: source_format)
     end
