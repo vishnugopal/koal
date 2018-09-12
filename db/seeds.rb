@@ -18,9 +18,7 @@ stories.each do |story|
   seed_data_folder = File.join(home_folder, "Downloads", story)
 
   if Dir.exist? seed_data_folder
-    import_service = StoryServices::ImportFolder.call(folder: seed_data_folder,
-                                                      source_type: :storiesonline,
-                                                      source_format: :html)
+    import_service = StoryServices::ImportService.call(folder: seed_data_folder)
     unless import_service.success?
       STDERR.puts "Import failed, are you sure the format is correct?"
       STDERR.puts import_service.exception.inspect.to_s

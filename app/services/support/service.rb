@@ -5,6 +5,13 @@ class Koal::Service
 
   attr_accessor :exception
 
+  def initialize
+    path = Rails.root.join("app", "services", "**", "*/")
+    exclude = ["support"]
+
+    #Koal::ModuleStubCreator.new(path: path, exclude: exclude)
+  end
+
   def completed!
     @success = true
     self
