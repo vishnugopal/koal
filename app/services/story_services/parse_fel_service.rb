@@ -1,6 +1,8 @@
 require_relative "../support/service"
 
 class StoryServices::ParseFelService < Koal::Service
+  attr_reader :author, :series, :stories
+
   def call(folder:)
     book_pattern = "*by_Fel_c.htm"
     books_html = Dir[File.join(folder, book_pattern)].sort
@@ -19,10 +21,10 @@ class StoryServices::ParseFelService < Koal::Service
     # The book downloads don't have descriptions themselves, so we've written our own descriptions based on the series.
     story_description = ""
     if (File.basename(book_html).to_s =~ /Tarrin_Kael/).present? #Tarrin Kael's Sennadar Series
-      story_description = "Book #{series_book_order} in the <em>#{series_name}</em>, an epic fantasy story series, where Tarrin Kael, a quiet and unassuming young human boy grows into one of the most powerful beings in the world, able to challenge even the gods!"
+      story_description = "Book #{series_book_order} in the #{series_name}, an epic fantasy story series, where Tarrin Kael, a quiet and unassuming young human boy grows into one of the most powerful beings in the world, able to challenge even the gods!"
     end
 
-    copyright_notice = "Copyright &copy; #{author_text}"
+    copyright_notice = "Copyright #{author_text}"
 
     chapter_count_xpath = "//a[@href='#TITLE']/following-sibling::a[last()]"
     chapter_count_node = book_doc.xpath(chapter_count_xpath)[0]
@@ -67,10 +69,18 @@ class StoryServices::ParseFelService < Koal::Service
       end
     end
 
-    puts story_description
-    puts chapter_contents.last[:title]
-    puts chapter_contents.last[:content][0..100]
-    puts outro_text
+    @author = author_text
+    @series = series_name
+    @stories = [{
+      name: story_name,
+      description: story_description,
+      intro: nil,
+      outro: outro_text,
+      copyright_notice: copyright_notice,
+      series_book_title: series_book_title,
+      series_book_order: series_book_order,
+      chapters: chapter_contents,
+    }]
 
     completed!
   rescue Exception => e

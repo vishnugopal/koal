@@ -12,6 +12,7 @@ stories = [
   "Santos_J_Romeo@Adventures_of_Me_and_Martha_Jane",
   "gwresearch@Magestic",
   "Blackie@The_Book",
+  "Tarrin Kael Firestaff Series by Fel",
 ]
 
 stories.each do |story|
