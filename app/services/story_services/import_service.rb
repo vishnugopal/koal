@@ -14,9 +14,12 @@ class StoryServices::ImportService < Koal::Service
   end
 
   def source_type
-    cover_file = File.join(@folder, "cover.html")
-    if File.exists? cover_file
+    sol_cover_file = File.join(@folder, "cover.html")
+    fel_story_pattern = "*by_Fel_c.htm"
+    if File.exists? sol_cover_file
       return :SOL
+    elsif Dir[File.join(@folder, fel_story_pattern)].length.nonzero?
+      return :FEL
     else
       raise ArgumentError, "Folder does not correspond to a known file type"
     end
