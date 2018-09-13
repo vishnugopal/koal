@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require_relative "../support/service"
 
 #
@@ -16,8 +18,9 @@ class StoryServices::ParseFelService < Koal::Service
     book_doc = File.open(book_html) { |f| Nokogiri::HTML(f) }
 
     series_and_book_xpath = "//div/p[position() >= 0 and position() < 5]"
-    series_name = book_doc.xpath(series_and_book_xpath)[1..2].map { |f| f.inner_text }.join.squish
-    series_book_title = book_doc.xpath(series_and_book_xpath)[3].inner_text.squish
+    data = book_doc.xpath(series_and_book_xpath)[0..3].map { |f| f.inner_text.squish }
+    series_name = data[0].blank? ? "#{data[1]} #{data[2]}" : "#{data[0]} #{data[1]}"
+    series_book_title = data[0].blank? ? data[3] : data[2]
     series_book_order = 1
 
     # Try finding the correct header node
@@ -29,13 +32,15 @@ class StoryServices::ParseFelService < Koal::Service
         break
       end
     end
-    story_name = book_doc.xpath("//#{header_xpath}[1]")[0].inner_text.chop
+    story_name = book_doc.xpath("//#{header_xpath}[1]")[0].inner_text.chop.gsub("©", "")
     author_text = book_doc.xpath("//#{header_xpath}[1]/following-sibling::p[1]").inner_text.squish.gsub("by ", "")
 
     # The book downloads don't have descriptions themselves, so we've written our own descriptions based on the series.
     story_description = ""
-    if (File.basename(book_html).to_s =~ /Tarrin_Kael/).present? #Tarrin Kael's Sennadar Series
+    if (File.basename(book_html).to_s =~ /Firestaff_Collection/).present?
       story_description = "Book #{series_book_order} in the #{series_name}, an epic fantasy story series, where Tarrin Kael, a quiet and unassuming young human boy grows into one of the most powerful beings in the world, able to challenge even the gods!"
+    elsif (File.basename(book_html).to_s =~ /Pyrosian_Chronicles/).present?
+      story_description = "Book #{series_book_order} in the #{series_name}. Tarrin Kael's next adventure takes him beyond Sennadar, and helps him understand how powerful and how unique he truly is."
     end
 
     copyright_notice = "Copyright #{author_text}"
