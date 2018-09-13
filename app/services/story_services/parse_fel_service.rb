@@ -1,6 +1,6 @@
 require_relative "../support/service"
 
-class StoryServices::ImportFelService < Koal::Service
+class StoryServices::ParseFelService < Koal::Service
   def call(folder:)
     book_pattern = "*by_Fel_c.htm"
     books_html = Dir[File.join(folder, book_pattern)].sort

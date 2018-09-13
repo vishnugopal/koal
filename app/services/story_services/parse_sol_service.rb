@@ -1,6 +1,8 @@
 require_relative "../support/service"
 
-class StoryServices::ImportSOLService < Koal::Service
+class StoryServices::ParseSOLService < Koal::Service
+  attr_reader :author, :series, :stories
+
   def call(folder:)
     cover_file = File.join(folder, "cover.html")
     index_file = File.join(folder, "index.html")
@@ -34,23 +36,18 @@ class StoryServices::ImportSOLService < Koal::Service
       chapter_contents << {title: chapter_title, content: chapter_content}
     end
 
-    # Do database operations
-    author = Author.find_or_create_by(name: author_text)
-    story = author.stories.find_by_name(story_name)
-    story ||= author.stories.create(name: story_name,
-                                    description: story_description,
-                                    intro: intro_text,
-                                    copyright_notice: copyright_notice)
-
-    chapter_contents.each_with_index do |chapter_data, index|
-      chapter_title = chapter_data[:title]
-      chapter_content = chapter_data[:content]
-
-      chapter = story.chapters.find_or_create_by(title: chapter_title)
-      chapter.contents = chapter_content
-      chapter.order = index + 1
-      chapter.save
-    end
+    @author = author_text
+    @series = nil
+    @stories = [{
+      name: story_name,
+      description: story_description,
+      intro: intro_text,
+      outro: nil,
+      copyright_notice: copyright_notice,
+      series_book_title: nil,
+      series_book_order: nil,
+      chapters: chapter_contents,
+    }]
 
     completed!
   rescue Exception => e

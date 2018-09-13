@@ -18,10 +18,18 @@ stories.each do |story|
   seed_data_folder = File.join(home_folder, "Downloads", story)
 
   if Dir.exist? seed_data_folder
-    import_service = StoryServices::ImportService.call(folder: seed_data_folder)
-    unless import_service.success?
-      STDERR.puts "Import failed, are you sure the format is correct?"
-      STDERR.puts import_service.exception.inspect.to_s
+    story_parse_service = StoryServices::ParseService.call(folder: seed_data_folder)
+    unless story_parse_service.success?
+      STDERR.puts "Story parse failed, are you sure the format is correct?"
+      exit 1
+    end
+    story_import_service = StoryServices::ImportService.call(author: story_parse_service.author,
+                                                             series: story_parse_service.series,
+                                                             stories: story_parse_service.stories)
+    unless story_import_service.success?
+      STDERR.puts "Story import failed, are you sure the format is correct?"
+      STDERR.puts story_import_service.exception.inspect.to_s
+      exit 1
     end
   else
     STDERR.puts "Seed data directory does not exist. Download appropriate stories, unzip & put it in ~/Downloads"
