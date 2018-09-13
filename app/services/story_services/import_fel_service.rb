@@ -16,25 +16,58 @@ class StoryServices::ImportFelService < Koal::Service
     story_name = book_doc.xpath("//h5[1]")[0].inner_text.chop
     author_text = book_doc.xpath("//h5[1]/following-sibling::p[1]").inner_text.squish.gsub("by ", "")
 
-    chapter_number = 1
-    chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p/following-sibling::h5[1]"
-    chapter_title_node = book_doc.xpath(chapter_title_xpath)
-    chapter_title = chapter_title_node.inner_text
-
-    next_chapter_number = chapter_number + 1
-    next_chapter_last_paragraph_xpath = "//a[@name='CH#{next_chapter_number.to_s.rjust(3, "0")}']/parent::p/preceding-sibling::p[1]"
-    next_chapter_last_paragraph_node = book_doc.xpath(next_chapter_last_paragraph_xpath)[0]
-
-    paragraph_index = 1
-    chapter_content_node = chapter_title_node.xpath("./following-sibling::p[#{paragraph_index}]")[0]
-    chapter_contents = ""
-    until chapter_content_node == next_chapter_last_paragraph_node
-      chapter_contents << chapter_content_node.to_xhtml.squish.gsub(' class="MsoNormal"', "").gsub("<p> ", "<p>").gsub("&#13;", "") << "\n"
-      paragraph_index += 1
-      chapter_content_node = chapter_title_node.xpath("./following-sibling::p[#{paragraph_index}]")[0]
+    # The book downloads don't have descriptions themselves, so we've written our own descriptions based on the series.
+    story_description = ""
+    if (File.basename(book_html).to_s =~ /Tarrin_Kael/).present? #Tarrin Kael's Sennadar Series
+      story_description = "An epic fantasy story, where Tarrin Kael grows from a human to one of the most powerful beings in the world, able to challenge even the gods!"
     end
 
-    puts chapter_contents
+    chapter_count_xpath = "//a[@href='#TITLE']/following-sibling::a[last()]"
+    chapter_count_node = book_doc.xpath(chapter_count_xpath)[0]
+    chapter_count = chapter_count_node["href"].gsub("#CH", "").to_i
+
+    chapter_contents = []
+    outro_text = nil
+    1.upto(chapter_count) do |chapter_number|
+      chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p/following-sibling::h5[1]"
+      chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+      chapter_title = chapter_title_node&.inner_text
+
+      next_chapter_number = chapter_number + 1
+      next_chapter_last_paragraph_xpath = "//a[@name='CH#{next_chapter_number.to_s.rjust(3, "0")}']/parent::p/preceding-sibling::p[1]"
+      next_chapter_last_paragraph_node = book_doc.xpath(next_chapter_last_paragraph_xpath)[0]
+
+      # i.e. if it's the last chapter, we process for outro instead
+      if chapter_number == chapter_count
+        chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p"
+        chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+        next_chapter_last_paragraph_xpath = "(//a[@href='#CH#{chapter_number.to_s.rjust(3, "0")}'])[last()]/ancestor::p/preceding-sibling::p[2]"
+        next_chapter_last_paragraph_node = book_doc.xpath(next_chapter_last_paragraph_xpath)[0]
+      end
+
+      paragraph_index = 1
+      chapter_content_node = chapter_title_node.xpath("./following-sibling::p[#{paragraph_index}]")[0]
+      chapter_content = ""
+      until chapter_content_node == next_chapter_last_paragraph_node
+        unless chapter_content_node.inner_text.squish.empty?
+          chapter_content << chapter_content_node.to_xhtml.squish.gsub("&#13;", "") << "\n"
+        end
+        paragraph_index += 1
+        chapter_content_node = chapter_title_node.xpath("./following-sibling::p[#{paragraph_index}]")[0]
+      end
+
+      chapter_content = ActionController::Base.helpers.sanitize(chapter_content, tags: %w(b i em strong p)).gsub('p class="MsoNormal"', "p").gsub("<p> ", "<p>")
+
+      if chapter_number == chapter_count
+        outro_text = "<p>" + ActionController::Base.helpers.sanitize(chapter_content, tags: %w()).squish + "</p>"
+      else
+        chapter_contents << {title: chapter_title, content: chapter_content}
+      end
+    end
+
+    puts chapter_contents.last[:title]
+    puts chapter_contents.last[:content][0..100]
+    puts outro_text
 
     completed!
   rescue Exception => e
