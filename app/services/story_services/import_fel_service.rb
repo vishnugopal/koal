@@ -19,8 +19,10 @@ class StoryServices::ImportFelService < Koal::Service
     # The book downloads don't have descriptions themselves, so we've written our own descriptions based on the series.
     story_description = ""
     if (File.basename(book_html).to_s =~ /Tarrin_Kael/).present? #Tarrin Kael's Sennadar Series
-      story_description = "An epic fantasy story, where Tarrin Kael grows from a human to one of the most powerful beings in the world, able to challenge even the gods!"
+      story_description = "Book #{series_book_order} in the <em>#{series_name}</em>, an epic fantasy story series, where Tarrin Kael, a quiet and unassuming young human boy grows into one of the most powerful beings in the world, able to challenge even the gods!"
     end
+
+    copyright_notice = "Copyright &copy; #{author_text}"
 
     chapter_count_xpath = "//a[@href='#TITLE']/following-sibling::a[last()]"
     chapter_count_node = book_doc.xpath(chapter_count_xpath)[0]
@@ -65,6 +67,7 @@ class StoryServices::ImportFelService < Koal::Service
       end
     end
 
+    puts story_description
     puts chapter_contents.last[:title]
     puts chapter_contents.last[:content][0..100]
     puts outro_text
