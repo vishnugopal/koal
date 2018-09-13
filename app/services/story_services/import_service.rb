@@ -5,7 +5,11 @@ class StoryServices::ImportService < Koal::Service
     @folder = folder
 
     converter_class = "StoryServices::Import#{source_type}Service".constantize
-    converter_class.call(folder: folder)
+    converter = converter_class.call(folder: folder)
+
+    unless converter.success?
+      raise converter.exception
+    end
 
     FileUtils.remove_entry_secure(folder) if remove_folder_after_import
     completed!
@@ -19,7 +23,7 @@ class StoryServices::ImportService < Koal::Service
     if File.exists? sol_cover_file
       return :SOL
     elsif Dir[File.join(@folder, fel_story_pattern)].length.nonzero?
-      return :FEL
+      return :Fel
     else
       raise ArgumentError, "Folder does not correspond to a known file type"
     end
