@@ -1,5 +1,10 @@
 require_relative "../support/service"
 
+#
+# This isn't the best code I've written, but parsing Fel's Word HTML output
+# is an excercise in despair. I've tried to identify common patterns when
+# possible!
+#
 class StoryServices::ParseFelService < Koal::Service
   attr_reader :author, :series, :stories
 
@@ -11,12 +16,21 @@ class StoryServices::ParseFelService < Koal::Service
     book_doc = File.open(book_html) { |f| Nokogiri::HTML(f) }
 
     series_and_book_xpath = "//div/p[position() >= 0 and position() < 5]"
-    series_name = book_doc.xpath(series_and_book_xpath)[1..2].map { |f| f.inner_text }.join
+    series_name = book_doc.xpath(series_and_book_xpath)[1..2].map { |f| f.inner_text }.join.squish
     series_book_title = book_doc.xpath(series_and_book_xpath)[3].inner_text.squish
     series_book_order = 1
 
-    story_name = book_doc.xpath("//h5[1]")[0].inner_text.chop
-    author_text = book_doc.xpath("//h5[1]/following-sibling::p[1]").inner_text.squish.gsub("by ", "")
+    # Try finding the correct header node
+    header_xpath = ""
+    ["h1", "h2", "h3", "h4", "h5"].each do |header_selector|
+      story_name_node = book_doc.xpath("//#{header_selector}[1]")[0]
+      if story_name_node
+        header_xpath = header_selector
+        break
+      end
+    end
+    story_name = book_doc.xpath("//#{header_xpath}[1]")[0].inner_text.chop
+    author_text = book_doc.xpath("//#{header_xpath}[1]/following-sibling::p[1]").inner_text.squish.gsub("by ", "")
 
     # The book downloads don't have descriptions themselves, so we've written our own descriptions based on the series.
     story_description = ""
@@ -26,15 +40,26 @@ class StoryServices::ParseFelService < Koal::Service
 
     copyright_notice = "Copyright #{author_text}"
 
-    chapter_count_xpath = "//a[@href='#TITLE']/following-sibling::a[last()]"
-    chapter_count_node = book_doc.xpath(chapter_count_xpath)[0]
-    chapter_count = chapter_count_node["href"].gsub("#CH", "").to_i
+    # Find chapter counts by iterating over
+    chapter_iterator = 1
+    loop do
+      chapter_count_xpath = "//a[@name='CH#{chapter_iterator.to_s.rjust(3, "0")}'][1]"
+      chapter_count_node = book_doc.xpath(chapter_count_xpath)[0]
+      break unless chapter_count_node
+      chapter_iterator += 1
+    end
+    chapter_count = chapter_iterator - 1
 
     chapter_contents = []
     outro_text = nil
     1.upto(chapter_count) do |chapter_number|
-      chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p/following-sibling::h5[1]"
+      chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p/following-sibling::#{header_xpath}[1]"
       chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+      unless chapter_title_node
+        chapter_title_xpath = chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::#{header_xpath}[1]"
+        chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+      end
+
       chapter_title = chapter_title_node&.inner_text
 
       next_chapter_number = chapter_number + 1
@@ -45,19 +70,35 @@ class StoryServices::ParseFelService < Koal::Service
       if chapter_number == chapter_count
         chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p"
         chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
-        next_chapter_last_paragraph_xpath = "(//a[@href='#CH#{chapter_number.to_s.rjust(3, "0")}'])[last()]/ancestor::p/preceding-sibling::p[2]"
+        next_chapter_last_paragraph_xpath = "(//a[@href='#CH001'])[last()]/ancestor::p/preceding-sibling::p[3]"
         next_chapter_last_paragraph_node = book_doc.xpath(next_chapter_last_paragraph_xpath)[0]
       end
 
-      paragraph_index = 1
-      chapter_content_node = chapter_title_node.xpath("./following-sibling::p[#{paragraph_index}]")[0]
+      paragraph_index = 0
       chapter_content = ""
-      until chapter_content_node == next_chapter_last_paragraph_node
-        unless chapter_content_node.inner_text.squish.empty?
-          chapter_content << chapter_content_node.to_xhtml.squish.gsub("&#13;", "") << "\n"
+
+      # Outro sometimes has additional content as headers
+      if chapter_number == chapter_count
+        chapter_content_node = chapter_title_node.xpath("./following-sibling::#{header_xpath}")[0]
+
+        if chapter_content_node and chapter_content_node.inner_text.squish.present?
+          chapter_content << chapter_content_node.inner_text.squish << "\n"
         end
+      end
+
+      loop do
         paragraph_index += 1
         chapter_content_node = chapter_title_node.xpath("./following-sibling::p[#{paragraph_index}]")[0]
+
+        unless chapter_content_node.inner_text.squish.empty?
+          if chapter_number == chapter_count
+            chapter_content << chapter_content_node.inner_text.squish << "\n"
+          else
+            chapter_content << chapter_content_node.to_xhtml.squish.gsub("&#13;", "") << "\n"
+          end
+        end
+
+        break if chapter_content_node == next_chapter_last_paragraph_node
       end
 
       chapter_content = ActionController::Base.helpers.sanitize(chapter_content, tags: %w(b i em strong p)).gsub('p class="MsoNormal"', "p").gsub("<p> ", "<p>")
