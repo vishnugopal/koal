@@ -13,14 +13,24 @@ class StoriesController < ApplicationController
     upload_service = StoryServices::UnzipUploadService.call(zipfile: zipfile_path,
                                                             story_file_name: zipfile_name)
     if upload_service.success?
-      import_service = StoryServices::ImportService.call(folder: upload_service.story_folder,
-                                                         remove_folder_after_import: true)
-      if import_service.success?
-        flash.notice = "Story successfully created"
+      parse_service = StoryServices::ParseService.call(folder: upload_service.story_folder,
+                                                       remove_folder_after_import: true)
+      if parse_service.success?
+        import_service = StoryServices::ImportService.call(author: parse_service.author,
+                                                           series: parse_service.series,
+                                                           stories: parse_service.stories)
+        if import_service.success?
+          flash.notice = "Story successfully created"
+        else
+          flash.alert = "Story import failed!"
+        end
       else
-        flash.alert = "Story creation failed!"
+        flash.alert = "Story parse failed!"
       end
+    else
+      flash.alert = "Story upload failed!"
     end
+
     flash.discard
   ensure
     @story = Story.new
