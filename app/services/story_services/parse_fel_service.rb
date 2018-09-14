@@ -83,6 +83,7 @@ class StoryServices::ParseFelService < Koal::Service
 
     chapter_contents = []
     outro_text = nil
+    outro_available = true
     1.upto(chapter_count) do |chapter_number|
       chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p/following-sibling::#{header_xpath}[1]"
       chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
@@ -91,7 +92,14 @@ class StoryServices::ParseFelService < Koal::Service
         chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
       end
 
-      chapter_title = chapter_title_node&.inner_text
+      chapter_title = chapter_title_node&.inner_text&.squish
+
+      # Sometimes, chapter titles are in a <p>, :sigh:
+      unless chapter_title == "Chapter #{chapter_number}"
+        chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p/following-sibling::p[1]"
+        chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+        chapter_title = chapter_title_node&.inner_text&.squish
+      end
 
       next_chapter_number = chapter_number + 1
       next_chapter_last_paragraph_xpath = "//a[@name='CH#{next_chapter_number.to_s.rjust(3, "0")}']/parent::p/preceding-sibling::p[1]"
@@ -129,6 +137,12 @@ class StoryServices::ParseFelService < Koal::Service
         paragraph_index += 1
         chapter_content_node = chapter_title_node.xpath("./following-sibling::p[#{paragraph_index}]")[0]
 
+        # At times, an outro section is present, but there is no content available.
+        if chapter_number == chapter_count && !chapter_content_node
+          outro_available = false
+          break
+        end
+
         unless chapter_content_node.inner_text.squish.empty?
           if chapter_number == chapter_count
             chapter_content << chapter_content_node.inner_text.squish << "\n"
@@ -142,7 +156,7 @@ class StoryServices::ParseFelService < Koal::Service
 
       chapter_content = ActionController::Base.helpers.sanitize(chapter_content, tags: %w(b i em strong p)).gsub('p class="MsoNormal"', "p").gsub("<p> ", "<p>")
 
-      if chapter_number == chapter_count
+      if chapter_number == chapter_count && outro_available
         outro_text = "<p>" + ActionController::Base.helpers.sanitize(chapter_content, tags: %w()).squish + "</p>"
       else
         chapter_contents << {title: chapter_title, content: chapter_content}
