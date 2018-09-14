@@ -7,20 +7,12 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 home_folder = `cd ~; pwd`.strip
+stories_folder = File.join(home_folder, "Downloads", "Books for Koal")
 
-stories = [
-  "Santos_J_Romeo@Adventures_of_Me_and_Martha_Jane",
-  "gwresearch@Magestic",
-  "Blackie@The_Book",
-  "Tarrin Kael Firestaff Series by Fel",
-  "Tarrin Kael Pyrosian Chronicles by Fel",
-]
-
-stories.each do |story|
-  seed_data_folder = File.join(home_folder, "Downloads", story)
-
-  if Dir.exist? seed_data_folder
-    story_parse_service = StoryServices::ParseService.call(folder: seed_data_folder)
+Dir.glob(File.join(stories_folder, "*")).select { |f| File.directory? f }.each do |story_folder|
+  if Dir.exist? story_folder
+    STDOUT.puts "Parsing #{story_folder}..."
+    story_parse_service = StoryServices::ParseService.call(folder: story_folder)
     unless story_parse_service.success?
       STDERR.puts "Story parse failed, are you sure the format is correct?"
       STDERR.puts story_parse_service.exception.inspect

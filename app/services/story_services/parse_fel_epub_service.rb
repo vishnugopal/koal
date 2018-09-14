@@ -26,6 +26,8 @@ class StoryServices::ParseFelEPUBService < Koal::Service
     story_name.gsub!(/by .*?$/i, "")&.squish!
 
     series_book_title, story_name = story_name.split(" - ")
+    series_book_title&.squish!
+    story_name&.squish!
     series_book_order = series_book_title.match(/Book (\d{1,2})/)&.public_send(:[], 1)&.to_i
 
     # We have custom descriptions for certain Ebooks because we don't like the ones that come with the Ebook.
@@ -33,6 +35,8 @@ class StoryServices::ParseFelEPUBService < Koal::Service
     story_description = case series_name
                         when "Tarrin Kael Firestaff Series"
                           "Book #{series_book_order} in the #{series_name}, an epic fantasy story series, where Tarrin Kael, a quiet and unassuming young human boy grows into one of the most powerful beings in the world, able to challenge even the gods!"
+                        when "Tarrin Kael Pyrosian Chronicles"
+                          "Book #{series_book_order} in the #{series_name}. Tarrin Kael's next adventure takes him beyond Sennadar, and helps him understand how powerful and how unique he truly is."
                         end
 
     intro_text = nil
@@ -59,6 +63,17 @@ class StoryServices::ParseFelEPUBService < Koal::Service
         if chapter_title_node
           chapter_title = chapter_title_node.inner_text.squish
           break
+        end
+      end
+
+      # At times, chapter titles are presented with <p> tags too. :sigh:
+      unless chapter_title
+        chapter_title_nodes = chapter_doc.css("p span.bold")
+        chapter_title_nodes.each do |node|
+          node_text = node.inner_text.squish
+          if node_text.match(/Chapter \d{1,3}/i) || node_text.match(/Epilogue/i)
+            chapter_title = node_text
+          end
         end
       end
 
@@ -159,6 +174,7 @@ class StoryServices::ParseFelEPUBService < Koal::Service
       text_content.match(/Epilogue.*?End of.*?$/i) ||
       text_content.match(/Title.*?End of.*?$/i) ||
       text_content.match(/^Title$/i) ||
+      text_content.match(/^To:.*?Title.*?ToC.*/) ||
       text_content.match(/^(\d+\s*?)+$/i) ||
       text_content.empty?
   end
