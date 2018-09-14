@@ -88,7 +88,12 @@ class StoryServices::ParseFelEPUBService < Koal::Service
         outro_text = chapter_title << " "
         outro_text << sanitize_to_text(html_content: chapter_content)
         next
-      elsif chapter_file.match(chapter_files.last) # or it's the last chapter
+      elsif chapter_file.match(chapter_files.last)
+        # If it's the last chapter, we might see outro appended to the end of it,
+        # this is to check for that case. We extract the outro, and then remove it
+        # from the chapter content, and instead present it separately as outro
+        # for better presentation.
+
         last_a_node = chapter_doc.css("a").last
 
         # Make sure we've got a good link
