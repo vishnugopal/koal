@@ -13,6 +13,7 @@ stories = [
   "gwresearch@Magestic",
   "Blackie@The_Book",
   "Tarrin Kael Firestaff Series by Fel",
+  "Tarrin Kael Pyrosian Chronicles by Fel",
 ]
 
 stories.each do |story|
