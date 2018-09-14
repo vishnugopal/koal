@@ -33,15 +33,12 @@ class StoryServices::ParseService < Koal::Service
 
   def source_type
     sol_cover_file = File.join(@folder, "cover.html")
-    fel_story_pattern = "*by_Fel_c.htm"
-    calibre_epub_file = File.join(@folder, "content.opf")
+    fel_story_pattern = "Tarrin_Kael*00*.html"
 
     if File.exists? sol_cover_file
       return :SOL
     elsif Dir[File.join(@folder, fel_story_pattern)].length.nonzero?
-      return :Fel
-    elsif File.exists? calibre_epub_file
-      return :CalibreEPUB
+      return :FelEPUB
     else
       raise ArgumentError, "Folder does not correspond to a known file type"
     end

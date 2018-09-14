@@ -2,7 +2,7 @@
 
 require_relative "../support/service"
 
-class StoryServices::ParseCalibreEPUBService < Koal::Service
+class StoryServices::ParseFelEPUBService < Koal::Service
   attr_reader :author, :series, :stories
 
   def call(folder:)
@@ -21,6 +21,7 @@ class StoryServices::ParseCalibreEPUBService < Koal::Service
     if story_name[-1] == "©"
       story_name.chop!
     end
+    story_name.gsub!(/by .*?$/i, "")&.squish!
 
     series_book_title, story_name = story_name.split(" - ")
     series_book_order = series_book_title.match(/Book (\d{1,2})/)&.public_send(:[], 1)&.to_i
@@ -63,10 +64,7 @@ class StoryServices::ParseCalibreEPUBService < Koal::Service
       chapter_paragraph_nodes = chapter_doc.css("p")
       chapter_paragraph_nodes = chapter_paragraph_nodes.reject do |node|
         text_content = node.inner_text.squish
-        text_content.match(/EoF$/) ||
-          text_content.match(/Title.*?Epilogue/) ||
-          text_content.match(/Go to Chapter/) ||
-          text_content.empty?
+        filter_paragraphs_by_text_content(text_content: text_content)
       end
 
       # Now replace <span class="bold"> and <span class="italic"> with semantic versions
@@ -83,9 +81,39 @@ class StoryServices::ParseCalibreEPUBService < Koal::Service
       end
 
       chapter_content = chapter_paragraph_nodes.map(&:to_html).join("\n")
-      chapter_content = ActionController::Base.helpers.sanitize(chapter_content, tags: %w(b i em strong p))
+      chapter_content = sanitize_to_html(html_content: chapter_content)
 
-      chapter_contents << {title: chapter_title, content: chapter_content}
+      # Extremely short chapters indicate it's an outro
+      if chapter_content.length < 500 && chapter_title.present?
+        outro_text = chapter_title << " "
+        outro_text << sanitize_to_text(html_content: chapter_content)
+        next
+      elsif chapter_file.match(chapter_files.last) # or it's the last chapter
+        last_a_node = chapter_doc.css("a").last
+
+        # Make sure we've got a good link
+        if last_a_node.inner_text.squish.include?("End of")
+          link_href = last_a_node.attribute("href").inner_text.gsub(/^#/, "")
+          outro_nodes = chapter_doc.xpath("//a[@id='#{link_href}']/ancestor::p/following-sibling::p")
+          outro_nodes = outro_nodes.reject do |node|
+            text_content = node.inner_text.squish
+            filter_paragraphs_by_text_content(text_content: text_content)
+          end
+
+          # Strip this away from existing chapter_content
+          outro_nodes_html_content = outro_nodes.map(&:to_html).join("\n")
+          outro_nodes_html_content = sanitize_to_html(html_content: outro_nodes_html_content)
+          chapter_content = chapter_content.gsub(outro_nodes_html_content, "")
+
+          # Now return outro as text
+          outro_text = sanitize_to_text(html_content: outro_nodes_html_content)
+        end
+      end
+
+      # We skip empty chapters. Yes, that happens! :sigh:
+      if chapter_title.present?
+        chapter_contents << {title: chapter_title, content: chapter_content}
+      end
     end
 
     @author = author_text
@@ -104,5 +132,26 @@ class StoryServices::ParseCalibreEPUBService < Koal::Service
     completed!
   rescue Exception => e
     failed!(exception: e)
+  end
+
+  private
+
+  def sanitize_to_html(html_content:)
+    ActionController::Base.helpers.sanitize(html_content, tags: %w(b i em strong p)).squish.gsub("<p> ", "<p>")
+  end
+
+  def sanitize_to_text(html_content:)
+    ActionController::Base.helpers.sanitize(html_content, tags: %w()).gsub(/\n/, " ")
+  end
+
+  def filter_paragraphs_by_text_content(text_content:)
+    text_content.match(/EoF$/) ||
+      text_content.match(/^Title.*?Epilogue/i) ||
+      text_content.match(/^Go to Chapter/i) ||
+      text_content.match(/^Goto Chapter/i) ||
+      text_content.match(/Epilogue.*?End of.*?$/i) ||
+      text_content.match(/^Title$/i) ||
+      text_content.match(/^(\d+\s*?)+$/i) ||
+      text_content.empty?
   end
 end
