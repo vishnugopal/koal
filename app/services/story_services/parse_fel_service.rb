@@ -10,24 +10,42 @@ require_relative "../support/service"
 class StoryServices::ParseFelService < Koal::Service
   attr_reader :author, :series, :stories
 
+  def initialize
+    @stories = []
+  end
+
   def call(folder:)
     book_pattern = "*by_Fel_c.htm"
-    books_html = Dir[File.join(folder, book_pattern)].sort
+    book_html_files = Dir[File.join(folder, book_pattern)].sort
 
-    book_html = books_html.first
-    book_doc = File.open(book_html) { |f| Nokogiri::HTML(f) }
+    book_html_files.each_with_index do |book_html_file, book_index|
+      puts "Parsing #{book_html_file}"
+      parse_book(book_html_file: book_html_file, series_book_order: book_index + 1)
+    end
+
+    completed!
+  rescue Exception => e
+    failed!(exception: e)
+  end
+
+  def parse_book(book_html_file:, series_book_order: nil)
+    book_doc = File.open(book_html_file) { |f| Nokogiri::HTML(f) }
 
     series_and_book_xpath = "//div/p[position() >= 0 and position() < 5]"
     data = book_doc.xpath(series_and_book_xpath)[0..3].map { |f| f.inner_text.squish }
     series_name = data[0].blank? ? "#{data[1]} #{data[2]}" : "#{data[0]} #{data[1]}"
     series_book_title = data[0].blank? ? data[3] : data[2]
-    series_book_order = 1
 
     # Try finding the correct header node
     header_xpath = ""
-    ["h1", "h2", "h3", "h4", "h5"].each do |header_selector|
-      story_name_node = book_doc.xpath("//#{header_selector}[1]")[0]
-      if story_name_node
+    ["h1", "h2", "h3", "h4", "h5"].reverse.each do |header_selector|
+      chapter_title_xpath = "//a[@name='CH001']/parent::p/following-sibling::#{header_selector}[1]"
+      chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+      unless chapter_title_node
+        chapter_title_xpath = chapter_title_xpath = "//a[@name='CH001']/parent::#{header_selector}[1]"
+        chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+      end
+      if chapter_title_node
         header_xpath = header_selector
         break
       end
@@ -37,9 +55,9 @@ class StoryServices::ParseFelService < Koal::Service
 
     # The book downloads don't have descriptions themselves, so we've written our own descriptions based on the series.
     story_description = ""
-    if (File.basename(book_html).to_s =~ /Firestaff_Collection/).present?
+    if (File.basename(book_html_file).to_s =~ /Firestaff_Collection/).present?
       story_description = "Book #{series_book_order} in the #{series_name}, an epic fantasy story series, where Tarrin Kael, a quiet and unassuming young human boy grows into one of the most powerful beings in the world, able to challenge even the gods!"
-    elsif (File.basename(book_html).to_s =~ /Pyrosian_Chronicles/).present?
+    elsif (File.basename(book_html_file).to_s =~ /Pyrosian_Chronicles/).present?
       story_description = "Book #{series_book_order} in the #{series_name}. Tarrin Kael's next adventure takes him beyond Sennadar, and helps him understand how powerful and how unique he truly is."
     end
 
@@ -51,6 +69,14 @@ class StoryServices::ParseFelService < Koal::Service
       chapter_count_xpath = "//a[@name='CH#{chapter_iterator.to_s.rjust(3, "0")}'][1]"
       chapter_count_node = book_doc.xpath(chapter_count_xpath)[0]
       break unless chapter_count_node
+
+      # We break if there are dummy a name="CH0018" non-existent chapters somewhere! :sigh:
+      chapter_count_paragraph_parent_xpath = "./parent::p[1]"
+      chapter_count_paragraph_parent_node = chapter_count_node.xpath(chapter_count_paragraph_parent_xpath)[0]
+      if chapter_count_paragraph_parent_node && chapter_count_paragraph_parent_node.inner_text.squish.empty?
+        break
+      end
+
       chapter_iterator += 1
     end
     chapter_count = chapter_iterator - 1
@@ -70,11 +96,19 @@ class StoryServices::ParseFelService < Koal::Service
       next_chapter_number = chapter_number + 1
       next_chapter_last_paragraph_xpath = "//a[@name='CH#{next_chapter_number.to_s.rjust(3, "0")}']/parent::p/preceding-sibling::p[1]"
       next_chapter_last_paragraph_node = book_doc.xpath(next_chapter_last_paragraph_xpath)[0]
+      unless next_chapter_last_paragraph_node
+        next_chapter_last_paragraph_xpath = "//a[@name='CH#{next_chapter_number.to_s.rjust(3, "0")}']/parent::h1/preceding-sibling::p[1]"
+        next_chapter_last_paragraph_node = book_doc.xpath(next_chapter_last_paragraph_xpath)[0]
+      end
 
       # i.e. if it's the last chapter, we process for outro instead
       if chapter_number == chapter_count
         chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::p"
         chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+        unless chapter_title_node
+          chapter_title_xpath = "//a[@name='CH#{chapter_number.to_s.rjust(3, "0")}']/parent::h1/preceding-sibling::p[1]"
+          chapter_title_node = book_doc.xpath(chapter_title_xpath)[0]
+        end
         next_chapter_last_paragraph_xpath = "(//a[@href='#CH001'])[last()]/ancestor::p/preceding-sibling::p[3]"
         next_chapter_last_paragraph_node = book_doc.xpath(next_chapter_last_paragraph_xpath)[0]
       end
@@ -115,9 +149,9 @@ class StoryServices::ParseFelService < Koal::Service
       end
     end
 
-    @author = author_text
-    @series = series_name
-    @stories = [{
+    @author ||= author_text
+    @series ||= series_name
+    @stories << {
       name: story_name,
       description: story_description,
       intro: nil,
@@ -126,10 +160,6 @@ class StoryServices::ParseFelService < Koal::Service
       series_book_title: series_book_title,
       series_book_order: series_book_order,
       chapters: chapter_contents,
-    }]
-
-    completed!
-  rescue Exception => e
-    failed!(exception: e)
+    }
   end
 end

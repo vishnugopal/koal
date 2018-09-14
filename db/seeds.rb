@@ -23,6 +23,8 @@ stories.each do |story|
     story_parse_service = StoryServices::ParseService.call(folder: seed_data_folder)
     unless story_parse_service.success?
       STDERR.puts "Story parse failed, are you sure the format is correct?"
+      STDERR.puts story_parse_service.exception.inspect
+      STDERR.puts story_parse_service.exception.backtrace
       exit 1
     end
     story_import_service = StoryServices::ImportService.call(author: story_parse_service.author,
@@ -30,7 +32,8 @@ stories.each do |story|
                                                              stories: story_parse_service.stories)
     unless story_import_service.success?
       STDERR.puts "Story import failed, are you sure the format is correct?"
-      STDERR.puts story_import_service.exception.inspect.to_s
+      STDERR.puts story_import_service.exception.inspect
+      STDERR.puts story_import_service.exception.backtrace
       exit 1
     end
   else
