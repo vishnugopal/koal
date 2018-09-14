@@ -18,6 +18,8 @@ class StoryServices::ParseFelEPUBService < Koal::Service
 
     story_name_node = content_xml_doc.xpath("//title")
     story_name = story_name_node.inner_text
+
+    # clean up copyright character and author atribution
     if story_name[-1] == "©"
       story_name.chop!
     end
@@ -84,7 +86,7 @@ class StoryServices::ParseFelEPUBService < Koal::Service
       chapter_content = sanitize_to_html(html_content: chapter_content)
 
       # Extremely short chapters indicate it's an outro
-      if chapter_content.length < 500 && chapter_title.present?
+      if chapter_content.length < 1000 && chapter_title.present?
         outro_text = chapter_title << " "
         outro_text << sanitize_to_text(html_content: chapter_content)
         next
@@ -115,7 +117,7 @@ class StoryServices::ParseFelEPUBService < Koal::Service
         end
       end
 
-      # We skip empty chapters. Yes, that happens! :sigh:
+      # We skip empty chapters. Yes, that happens a lot! :sigh:
       if chapter_title.present?
         chapter_contents << {title: chapter_title, content: chapter_content}
       end
@@ -155,6 +157,7 @@ class StoryServices::ParseFelEPUBService < Koal::Service
       text_content.match(/^Go to Chapter/i) ||
       text_content.match(/^Goto Chapter/i) ||
       text_content.match(/Epilogue.*?End of.*?$/i) ||
+      text_content.match(/Title.*?End of.*?$/i) ||
       text_content.match(/^Title$/i) ||
       text_content.match(/^(\d+\s*?)+$/i) ||
       text_content.empty?
