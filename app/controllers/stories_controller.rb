@@ -41,7 +41,7 @@ class StoriesController < ApplicationController
   end
 
   def show
-    @story = Story.find(params[:id])
-    @chapter = @story.chapters.find_by(order: params[:chapter_order])
+    @story = Story.find(params[:id]) or not_found
+    @chapter = @story.chapters.find_by(order: params[:chapter_order]) or not_found
   end
 end

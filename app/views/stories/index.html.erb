@@ -2,17 +2,24 @@
 <%= render "index_header" -%>
 
 <section class="container index">
-<h2>Stories</h2>
-<ul class="list-reset">
-<% @stories.each do |story| -%>
-<li>
-  <h4><%= story.name %> by <%= story.author.name %></h4>
-  <p><%= story.description %></p>
-  <a href="<%= story_path(id: story.id, slug: story.slug) %>" class="button">Read</a>
-</li>
-<% unless story == @stories.last -%><hr /><% end -%>
-<% end -%>
-</ul>
+  <section class="about">
+    <h2>Koal</h2>
+    <p>Koal collects the best of amateur writing in one simple, mobile-friendly website.</p>
+    <p>All stories here are curated, “best of the best” collections from years of reading amateur fiction from the nooks & corners of the internet. Many stories are now hard to find & only available on obscure sites or newsgroups, or behind paywalls. This is an effort to consolidate all of them in a single place, and also build a beautiful reading experience to enjoy these timeless words.</p>
+  </section>
+  <section class="stories">
+  <h2>Stories</h2>
+  <ul class="list-reset">
+  <% @stories.each do |story| -%>
+  <li>
+    <h4><%= story.name %> by <%= story.author.name %></h4>
+    <p><%= story.description %></p>
+    <a href="<%= story_path(id: story.id, slug: story.slug) %>" class="button">Read</a>
+  </li>
+  <% unless story == @stories.last -%><hr /><% end -%>
+  <% end -%>
+  </ul>
+  </section>
 </section>
 
 <%= render "index_footer" -%>

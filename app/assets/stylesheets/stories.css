@@ -92,6 +92,10 @@ section.index {
   }
 }
 
+section.stories {
+  @apply .mt-20;
+}
+
 footer {
   @apply .flex .mx-auto .px-4 .pt-6 .mb-24 .mt-10 .border-grey-darkest .border-t;
 }
