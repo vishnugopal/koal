@@ -1,18 +1,11 @@
 <% content_for :title do -%><%= @story.name %> by <%= @story.author.name %><% end -%>
 <% content_for :description do -%><%= @story.description %><% end -%>
 
-
-<header class="story">
-  <div class="flex-none w-8 m-5">
-    <a href="<%= root_path %>"><img class="max-w-full max-h-full" src="<%= asset_pack_path 'images/logo.png' %>" /></a>
-  </div>
-  <div class="flex-1 mt-6 mr-2 align-text-bottom">
-    <nav><a href="" rel="author"><%= @story.author.name %></a></nav>
-    <h2><%= @story.name %></h2>
-  </div>
-</header>
+<%= render "header" -%>
 
 <section class="container story">
+<nav><a href="" rel="author"><%= @story.author.name %></a></nav>
+<h2><%= @story.name %></h2>
 <% if @chapter.first? && @story.intro -%>
   <blockquote>
     <%= @story.intro.html_safe %>
@@ -37,5 +30,5 @@
     <a class="inline-block" href="<%= story_path(id: @story.id, slug: @story.slug, chapter_order: @chapter.order + 1) %>">Next Chapter</a>
 <% end -%>
   </nav>
-  <p class="w-1/3 md:w-auto"><%= @story.copyright_notice %></p>
+  <small class="w-1/3 md:w-auto"><%= @story.copyright_notice %></small>
 </footer>

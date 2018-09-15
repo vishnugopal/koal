@@ -57,7 +57,7 @@ header.story {
 }
 
 section.story {
-  @apply .mx-auto .px-4;
+  @apply .mx-auto .px-8;
 }
 
 @screen md {
