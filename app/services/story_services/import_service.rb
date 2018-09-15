@@ -30,14 +30,21 @@ class StoryServices::ImportService < Koal::Service
 
     stories.each do |story|
       story_record = author_record.stories.find_by_name(story[:name])
-      story_record ||= author_record.stories.create(name: story[:name],
-                                                    description: story[:description],
-                                                    intro: story[:intro],
-                                                    outro: story[:outro],
-                                                    copyright_notice: story[:copyright_notice],
-                                                    series_name: story[:series_name],
-                                                    series_book_title: story[:series_book_title],
-                                                    series_book_order: story[:series_book_order])
+      attributes = {
+        name: story[:name],
+        description: story[:description],
+        intro: story[:intro],
+        outro: story[:outro],
+        copyright_notice: story[:copyright_notice],
+        series_name: story[:series_name],
+        series_book_title: story[:series_book_title],
+        series_book_order: story[:series_book_order],
+      }
+      if story_record
+        story_record ||= author_record.stories.update(attributes)
+      else
+        story_record ||= author_record.stories.create(attributes)
+      end
 
       story[:chapters].each_with_index do |chapter_data, index|
         chapter_title = chapter_data[:title]

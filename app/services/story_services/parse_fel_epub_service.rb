@@ -135,8 +135,8 @@ class StoryServices::ParseFelEPUBService < Koal::Service
           outro_nodes_html_content = sanitize_to_html(html_content: outro_nodes_html_content)
           chapter_content = chapter_content.gsub(outro_nodes_html_content, "")
 
-          # Now return outro as text
-          outro_text = sanitize_to_text(html_content: outro_nodes_html_content)
+          # Now return outro as text in a single paragraph
+          outro_text = "<p>" + sanitize_to_text(html_content: outro_nodes_html_content) + "</p>"
         end
       end
 
