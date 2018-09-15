@@ -105,6 +105,13 @@ class StoryServices::ParseFelEPUBService < Koal::Service
       if chapter_content.length < 1000 && chapter_title.present?
         outro_text = chapter_title << " "
         outro_text << sanitize_to_text(html_content: chapter_content)
+
+        # Now, weed out the case where chapter_content is empty
+        outro_text.squish!
+        if outro_text == chapter_title
+          outro_text = nil
+        end
+
         next
       elsif chapter_file.match(chapter_files.last)
         # If it's the last chapter, we might see outro appended to the end of it,
@@ -168,15 +175,20 @@ class StoryServices::ParseFelEPUBService < Koal::Service
   end
 
   def filter_paragraphs_by_text_content(text_content:)
+    text_content.squish!
     text_content.match(/EoF$/) ||
       text_content.match(/^Title.*?Epilogue/i) ||
+      text_content.match(/^Epilogue.*?Epilogue/i) ||
       text_content.match(/^Go to Chapter/i) ||
       text_content.match(/^Goto Chapter/i) ||
       text_content.match(/Epilogue.*?End of.*?$/i) ||
       text_content.match(/Title.*?End of.*?$/i) ||
       text_content.match(/^Title$/i) ||
+      text_content.match(/^Epilogue$/i) ||
       text_content.match(/^To:.*?Title.*?ToC.*/) ||
+      text_content.match(/^To:.*?Title.*?Epilogue.*/) ||
       text_content.match(/^(\d+\s*?)+$/i) ||
+      text_content.match(/^(\d+\s*?)+.*?Epilogue$/i) ||
       text_content.empty?
   end
 end
