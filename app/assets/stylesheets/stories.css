@@ -1,11 +1,27 @@
 @import "./application.css";
 
 body {
-  @apply .font-sans .bg-black .text-grey-dark .antialiased;
+  @apply .font-sans .bg-black .text-grey-dark .antialiased .leading-normal;
+}
+
+h1 {
+  @apply .text-4xl .mb-10 .mx-auto;
+}
+
+h2 {
+  @apply .font-semibold .text-3xl .mb-6;
+}
+
+h3 {
+  @apply .font-semibold .text-2xl .mb-6;
+}
+
+h4 {
+  @apply .mb-2 .text-2xl;
 }
 
 p {
-  @apply .mb-5;
+  @apply .mb-5 .text-xl;
 }
 
 h3 + p:first-line {
@@ -22,4 +38,81 @@ a {
 
 a:hover {
   @apply .text-grey .border-grey;
+}
+
+hr {
+  @apply .border-grey-darkest .border-t .mt-10 .mb-10;
+}
+
+small {
+  @apply .text-base;
+}
+
+blockquote {
+  @apply .mx-10 .mb-20 .mt-20;
+}
+
+header.story {
+  @apply .flex .mb-6 .mt-6;
+}
+
+section.story {
+  @apply .mx-auto .px-4;
+}
+
+@screen md {
+  section.story {
+    @apply .w-4/5;
+  }
+}
+
+@screen lg {
+  section.story {
+    @apply .w-3/5;
+  }
+}
+
+header.index {
+  @apply .mx-auto .mt-12 .pl-8 .pr-8;
+}
+
+section.index {
+  @apply .mx-auto .mt-10 .px-8 .text-xl;
+}
+
+@screen md {
+  section.index {
+    @apply .w-4/5;
+  }
+}
+
+@screen lg {
+  section.index {
+    @apply .w-3/5;
+  }
+}
+
+footer {
+  @apply .flex .mx-auto .px-4 .pt-6 .mb-24 .mt-10 .border-grey-darkest .border-t;
+}
+
+.button {
+  @apply .bg-grey-light .inline-block .p-2 .text-grey-darkest rounded;
+}
+
+.button:hover {
+  @apply .bg-grey-lighter;
+  @apply .text-grey-darkest;
+}
+
+.flash {
+  @apply .w-full .p-3 .mb-5;
+}
+
+.flash-notice {
+  @apply .flash .bg-yellow-light .text-black;
+}
+
+.flash-alert {
+  @apply .flash bg-red-light text-black;
 }

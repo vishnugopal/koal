@@ -1,33 +1,18 @@
-<% content_for :title do -%>
-The best of amateur writing in one simple, mobile-friendly website.
-<% end -%>
-<% content_for :description do -%>
-Koal curates over <%= Story.count %> stories (from <%= Author.count %> authors) — amateur writing from all across the internet and presents it in a readable, mobile-friendly form.
-<% end -%>
+<%= render "index_meta" -%>
+<%= render "index_header" -%>
 
-<header class="container mx-auto mt-12 leading-normal">
-  <div class="w-12 m-5 ml-8 mr-8">
-    <a href="<%= root_path %>"><img class="max-w-full max-h-full" src="<%= asset_pack_path 'images/logo.png' %>" /></a>
-   </div>
-  <h1 class="m-5 ml-8 mr-8 text-4xl mt-10 mx-auto">Koal</h1>
-  <p class="m-5 ml-8 mr-8 text-2xl mx-auto">The best of amateur writing in one simple, mobile-friendly website.</p>
-  <p class="m-5 ml-8 mr-8 text-xl mx-auto">All stories here are curated, “best of the best” collections from years of reading amateur fiction from the nooks & corners of the internet. Many stories are now hard to find & only available on obscure sites or newsgroups, or behind paywalls. This is an effort to consolidate all of them in a single place, and also build a beautiful reading experience to enjoy these timeless words.</p>
-</header>
-
-<div class="container lg:w-3/5 md:w-4/5 mx-auto px-8 leading-normal text-xl">
-<h2 class="mt-10 mb-5">Upload Story</h2>
+<section class="container index">
+<h2>Upload Story</h2>
 <% if flash.notice -%>
-<div class="w-full p-3 mb-5 bg-yellow-light text-black"><%= flash.notice %></div>
+<div class="flash-notice"><%= flash.notice %></div>
 <% end -%>
 <% if flash.alert %>
-<div class="w-full p-3 mb-5 bg-red-light text-black"><%= flash.alert %></div>
+<div class="flash-alert"><%= flash.alert %></div>
 <% end %>
 <%= form_for @story do |f| %>
   <%= f.file_field :zipfile, { class: 'appearance-none mb-10 rounded w-full inline-block rounded', accept: 'application/zip, application/octet-stream' } %>
-  <%= f.submit "Upload", { class: 'shadow appearance-none bg-grey-lighter p-2 inline-block rounded' } %>
+  <%= f.submit "Upload", { class: 'button' } %>
 <% end %>
-</div>
+</section>
 
-<footer class="container flex mx-auto px-4 mb-24 mt-10 leading-normal border-grey-darkest pt-6 border-t">
-  <p class="w-auto">Copyright &copy; Vishnu Gopal. All stories belong to their respective authors. When at all possible, authors have been contacted for permission to reproduce their stories here.</p>
-</footer>
+<%= render "index_footer" -%>
