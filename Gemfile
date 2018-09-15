@@ -36,6 +36,8 @@ gem 'nokogiri', '>= 1.8.0'
 group :production do
   # Use postgresql as the database for Active Record
   gem 'pg'
+  # Sentry to catch exceptions
+  gem "sentry-raven"
 end
 
 group :development, :test do
