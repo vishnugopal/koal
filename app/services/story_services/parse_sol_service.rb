@@ -23,6 +23,10 @@ class StoryServices::ParseSOLService < Koal::Service
     author_text = index_doc.css("h3 + h4")[0].inner_html.gsub(/^by /, "")
     copyright_notice = index_doc.css("h4 + h4")[0].inner_html
 
+    # Correct misspellings
+    author_text = author_text.gsub("Santos J. Romeo", "Santo J. Romeo")
+    copyright_notice = copyright_notice.gsub("Santos J. Romeo", "Santo J. Romeo")
+
     chapter_files = index_doc.css("small a").collect do |link|
       File.join(folder, link["href"])
     end
