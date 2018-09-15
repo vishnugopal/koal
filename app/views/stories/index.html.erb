@@ -8,14 +8,14 @@ Koal curates over <%= Story.count %> stories (from <%= Author.count %> authors) 
 <%= render "header" -%>
 
 <main>
-  <section class="about">
+  <section class="about mb-10">
     <h1>Koal</h1>
     <p>Koal collects the best of amateur writing in one simple, mobile-friendly website.</p>
-    <p>All stories here are curated, “best of the best” collections from years of reading amateur fiction from the nooks & corners of the internet. Many stories are now hard to find & only available on obscure sites or newsgroups, or behind paywalls. This is an effort to consolidate all of them in a single place, and also build a beautiful reading experience to enjoy these timeless words.</p>
+    <p>All stories here are curated, “best of the best” collections from years of reading amateur fiction, fan-fiction, and erotica from the nooks & corners of the Internet. Many stories are now hard to find & only available on obscure sites or newsgroups, or behind paywalls. This is an effort to consolidate all of them in a single place, and also build a beautiful reading experience to enjoy these timeless words.</p>
   </section>
   <section class="stories">
   <h2>Stories</h2>
-  <ul class="list-reset">
+  <ul class="list-reset mt-10 mb-5">
   <% @stories.each do |story| -%>
   <li>
     <h4><%= story.name %> by <%= story.author.name %></h4>

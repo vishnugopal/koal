@@ -33,7 +33,7 @@ h3 + p::first-letter {
 }
 
 hr {
-  @apply .border-grey-darkest .border-t .mt-10 .mb-10;
+  @apply .border-koal-light .border-t .mt-10 .mb-10 .mx-32;
 }
 
 small {
@@ -65,7 +65,7 @@ main {
 }
 
 footer {
-  @apply .flex .mx-auto .px-4 .pt-6 .mb-24 .mt-10 .border-grey-darkest .border-t;
+  @apply .flex .mx-auto .px-4 .pt-6 .mb-24 .mt-10 .border-koal-dark .border-t;
 }
 
 .button {
