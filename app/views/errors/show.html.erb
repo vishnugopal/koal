@@ -1,0 +1,15 @@
+<%= render "stories/index_meta" -%>
+<%= render "stories/index_header" -%>
+
+<section class="container index">
+<% case @status_code -%>
+<% when '404' -%>
+<h2>Couldn't find that page</h2>
+<p>Koal is still in active development, so some links might break. Sorry!</p>
+<% when '500' -%>
+<h2>Something went wrong</h2>
+<p>Koal is still in active development, so things might break here. Fortunately, we've recorded this error, so things will improve soon!</p>
+<% end -%>
+</section>
+
+<%= render "stories/index_footer" -%>

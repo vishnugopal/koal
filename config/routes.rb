@@ -6,5 +6,10 @@ Rails.application.routes.draw do
 
   get ":id-:slug(/:chapter_order)", to: "stories#show", constraints: {id: /\d{1,}/},
                                     defaults: {chapter_order: 1}, as: :story
+
+  %w(404 422 500 503).each do |code|
+    get code, :to => "errors#show", :code => code
+  end
+
   root to: "stories#index"
 end
