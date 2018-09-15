@@ -17,14 +17,14 @@ Koal curates over <%= Story.count %> stories (from <%= Author.count %> authors) 
 <div class="container lg:w-3/5 md:w-4/5 mx-auto px-8 leading-normal text-xl">
 <h2 class="mt-10 mb-5">Stories</h2>
 <ul class="list-reset">
-<% Story.all.each do |story| -%>
+<% @stories.each do |story| -%>
 <li>
   <h4 class="mb-2 text-2xl"><%= story.name %> by <%= story.author.name %></h4>
   <p><%= story.description %></p>
   <a href="<%= story_path(id: story.id, slug: story.slug) %>" class="bg-grey-light inline-block p-2 hover:bg-grey-lighter text-grey-darkest hover:text-grey-darkest">Read</a>
 </li>
 
-<% unless story == Story.last -%>
+<% unless story == @stories.last -%>
 <hr class="border-grey-darkest border-t mt-10 mb-10" />
 <% end -%>
 

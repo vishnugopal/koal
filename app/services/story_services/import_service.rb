@@ -1,19 +1,20 @@
 require_relative "../support/service"
 
 #
-# Bulk import stories in the same series by the same author
+# Bulk import stories by the same author
 #
 # Params:
 # `author`: A string author name
-# `series`: A string for the series name, optional.
 # `stories`:
 #   An array of stories, each story is a tuple with structure:
+#  ```
 #     {
 #       name: "The name of the story",
 #       description: "A short description of the story used in front matter",
 #       intro: "The intro text of the story, presented before Chapter 1.",
 #       outro: "The outro text, presented after the last chapter.",
 #       copyright_notice: "The copyright notice presented in the footer.",
+#       series_name: A string for the series name, optional.
 #       series_book_title: "The title of the book in the series, for e.g. 'Book I'",
 #       series_book_order: "An integer, the order of the book in the series, starts with 1.",
 #       chapters: [
@@ -21,11 +22,10 @@ require_relative "../support/service"
 #         contents: "An HTML-formatted contents of the chapter. Use simple <p/> tags for paragraphs, and <b>, <i>, <em>, <strong>, etc. for emphasis.",
 #       ],
 #     }
+#  ```
 #
 class StoryServices::ImportService < Koal::Service
-  def call(author:, series: nil, stories:)
-    # TODO: Make series import work. series:, series_book_title:, series_book_order:
-    # TODO: Add outro
+  def call(author:, stories:)
     author_record = Author.find_or_create_by(name: author)
 
     stories.each do |story|
@@ -33,7 +33,11 @@ class StoryServices::ImportService < Koal::Service
       story_record ||= author_record.stories.create(name: story[:name],
                                                     description: story[:description],
                                                     intro: story[:intro],
-                                                    copyright_notice: story[:copyright_notice])
+                                                    outro: story[:outro],
+                                                    copyright_notice: story[:copyright_notice],
+                                                    series_name: story[:series_name],
+                                                    series_book_title: story[:series_book_title],
+                                                    series_book_order: story[:series_book_order])
 
       story[:chapters].each_with_index do |chapter_data, index|
         chapter_title = chapter_data[:title]

@@ -1,7 +1,7 @@
 require_relative "../support/service"
 
 class StoryServices::ParseSOLService < Koal::Service
-  attr_reader :author, :series, :stories
+  attr_reader :author, :stories
 
   def call(folder:)
     cover_file = File.join(folder, "cover.html")
@@ -41,13 +41,13 @@ class StoryServices::ParseSOLService < Koal::Service
     end
 
     @author = author_text
-    @series = nil
     @stories = [{
       name: story_name,
       description: story_description,
       intro: intro_text,
       outro: nil,
       copyright_notice: copyright_notice,
+      series_name: nil,
       series_book_title: nil,
       series_book_order: nil,
       chapters: chapter_contents,

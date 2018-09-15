@@ -1,4 +1,8 @@
 class StoriesController < ApplicationController
+  def index
+    @stories = Story.all.order(series_name: :asc, series_book_order: :asc)
+  end
+
   def new
     @story = Story.new
   end
@@ -17,7 +21,6 @@ class StoriesController < ApplicationController
                                                        remove_folder_after_import: true)
       if parse_service.success?
         import_service = StoryServices::ImportService.call(author: parse_service.author,
-                                                           series: parse_service.series,
                                                            stories: parse_service.stories)
         if import_service.success?
           flash.notice = "Story successfully created"

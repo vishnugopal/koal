@@ -1,7 +1,7 @@
 require_relative "../support/service"
 
 class StoryServices::ParseService < Koal::Service
-  attr_reader :author, :series, :stories
+  attr_reader :author, :stories
 
   def call(folder:, remove_folder_after_import: false)
     @folder = folder
@@ -21,10 +21,6 @@ class StoryServices::ParseService < Koal::Service
 
   def author
     @parser.author
-  end
-
-  def series
-    @parser.series
   end
 
   def stories

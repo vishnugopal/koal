@@ -20,7 +20,6 @@ Dir.glob(File.join(stories_folder, "*")).select { |f| File.directory? f }.each d
       exit 1
     end
     story_import_service = StoryServices::ImportService.call(author: story_parse_service.author,
-                                                             series: story_parse_service.series,
                                                              stories: story_parse_service.stories)
     unless story_import_service.success?
       STDERR.puts "Story import failed, are you sure the format is correct?"

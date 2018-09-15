@@ -3,7 +3,7 @@
 require_relative "../support/service"
 
 class StoryServices::ParseFelEPUBService < Koal::Service
-  attr_reader :author, :series, :stories
+  attr_reader :author, :stories
 
   def call(folder:)
     content_xml_file = File.join(folder, "content.opf")
@@ -27,6 +27,7 @@ class StoryServices::ParseFelEPUBService < Koal::Service
 
     series_book_title, story_name = story_name.split(" - ")
     series_book_title&.squish!
+    series_book_title&.gsub!(series_name, "")&.squish!
     story_name&.squish!
     series_book_order = series_book_title.match(/Book (\d{1,2})/)&.public_send(:[], 1)&.to_i
 
@@ -139,13 +140,13 @@ class StoryServices::ParseFelEPUBService < Koal::Service
     end
 
     @author = author_text
-    @series = series_name
     @stories = [{
       name: story_name,
       description: story_description,
       intro: intro_text,
       outro: outro_text,
       copyright_notice: copyright_notice,
+      series_name: series_name,
       series_book_title: series_book_title,
       series_book_order: series_book_order,
       chapters: chapter_contents,
