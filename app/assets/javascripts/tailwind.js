@@ -46,6 +46,16 @@ View the full documentation at https://tailwindcss.com.
 let colors = {
   'transparent': 'transparent',
 
+  'koal-dark': '#092940',
+  'koal-light': '#687f91',
+  'koal-tint': '#397aac',
+  'koal-tint-highlight': '#cfdce6',
+  'koal-text': '#8795a1',
+  'koal-text-dark': '#22292f',
+  'koal-text-light': '#8795a1',
+  'koal-warn': '#fff382',
+  'koal-error': '#ef5753',
+
   'black': '#22292f',
   'grey-darkest': '#3d4852',
   'grey-darker': '#606f7b',

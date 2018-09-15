@@ -3,8 +3,8 @@
 
 <%= render "header" -%>
 
-<section class="container story">
-<nav><a href="" rel="author"><%= @story.author.name %></a></nav>
+<main>
+<p><%= @story.author.name %></p>
 <h2><%= @story.name %></h2>
 <% if @chapter.first? && @story.intro -%>
   <blockquote>
@@ -18,16 +18,15 @@
     <%= @story.outro.html_safe %>
   </blockquote>
 <% end -%>
-</section>
+</main>
 
 <footer class="container">
   <nav class="flex-1">
 <% unless @chapter.first? -%>
-    <a class="inline-block" href="<%= story_path(id: @story.id, slug: @story.slug, chapter_order: @chapter.order - 1) %>">Previous Chapter</a>
+    <a class="button" href="<%= story_path(id: @story.id, slug: @story.slug, chapter_order: @chapter.order - 1) %>">Previous Chapter</a>
 <% end -%>
-<% unless @chapter.first? || @chapter.last? -%>|<% end -%>
 <% unless @chapter.last? -%>
-    <a class="inline-block" href="<%= story_path(id: @story.id, slug: @story.slug, chapter_order: @chapter.order + 1) %>">Next Chapter</a>
+    <a class="button" href="<%= story_path(id: @story.id, slug: @story.slug, chapter_order: @chapter.order + 1) %>">Next Chapter</a>
 <% end -%>
   </nav>
   <small class="w-1/3 md:w-auto"><%= @story.copyright_notice %></small>

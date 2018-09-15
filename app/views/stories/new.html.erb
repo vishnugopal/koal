@@ -1,6 +1,6 @@
 <%= render "header" -%>
 
-<section class="container index">
+<main>
 <h2>Upload Story</h2>
 <% if flash.notice -%>
 <div class="flash-notice"><%= flash.notice %></div>
@@ -12,6 +12,6 @@
   <%= f.file_field :zipfile, { class: 'appearance-none mb-10 rounded w-full inline-block rounded', accept: 'application/zip, application/octet-stream' } %>
   <%= f.submit "Upload", { class: 'button' } %>
 <% end %>
-</section>
+</main>
 
 <%= render "footer" -%>

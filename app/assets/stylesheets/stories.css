@@ -1,7 +1,7 @@
 @import "./application.css";
 
 body {
-  @apply .font-sans .bg-black .text-grey-dark .antialiased .leading-normal;
+  @apply .font-sans .text-koal-text-dark .antialiased .leading-normal .bg-koal-light;
 }
 
 h1 {
@@ -32,14 +32,6 @@ h3 + p::first-letter {
   @apply .mt-0 .mr-0 float-left .text-3xl .font-bold .leading-none;
 }
 
-a {
-  @apply .font-normal .no-underline .text-lg .text-grey-darker;
-}
-
-a:hover {
-  @apply .text-grey .border-grey;
-}
-
 hr {
   @apply .border-grey-darkest .border-t .mt-10 .mb-10;
 }
@@ -52,48 +44,24 @@ blockquote {
   @apply .mx-10 .mb-20 .mt-20;
 }
 
-header.story {
-  @apply .flex .mb-6 .mt-6;
-}
-
-section.story {
-  @apply .mx-auto .px-8;
-}
-
-@screen md {
-  section.story {
-    @apply .w-4/5;
-  }
-}
-
-@screen lg {
-  section.story {
-    @apply .w-3/5;
-  }
-}
-
-header.index {
+header {
   @apply .mx-auto .mt-12 .pl-8 .pr-8;
 }
 
-section.index {
-  @apply .mx-auto .mt-10 .px-8 .text-xl;
+main {
+  @apply .mx-auto .mt-10 .text-koal-text-light .p-8 .text-xl .rounded-lg .max-w-md .bg-koal-dark;
 }
 
-@screen md {
-  section.index {
+@screen sm {
+  main {
     @apply .w-4/5;
   }
 }
 
 @screen lg {
-  section.index {
+  main {
     @apply .w-3/5;
   }
-}
-
-section.stories {
-  @apply .mt-20;
 }
 
 footer {
@@ -101,18 +69,17 @@ footer {
 }
 
 .button {
-  @apply .bg-grey-light .inline-block .p-2 .text-grey-darkest rounded;
+  @apply .inline-block .p-3 .no-underline .text-koal-tint-highlight .rounded .bg-koal-tint;
 }
 
 .button:hover {
-  @apply .bg-grey-lighter;
-  @apply .text-grey-darkest;
+  @apply .text-koal-tint .cursor-pointer .bg-koal-tint-highlight;
 }
 
 .flash-notice {
-  @apply .w-full .p-3 .mb-5 .bg-yellow-light .text-black;
+  @apply .w-full .p-3 .mb-5 .bg-koal-warn .text-koal-text-dark;
 }
 
 .flash-alert {
-  @apply .w-full .p-3 .mb-5 bg-red-light text-black;
+  @apply .w-full .p-3 .mb-5 .bg-koal-error .text-koal-text-dark;
 }
