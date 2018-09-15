@@ -22,6 +22,12 @@
   <h3 class="font-semibold text-2xl mb-6"><%= @chapter.title %></h3>
 
   <%= @chapter.contents.html_safe %>
+
+<% if @chapter.last? && @story.outro -%>
+  <blockquote class="mx-10 mb-20 mt-20">
+    <%= @story.outro.html_safe %>
+  </blockquote>
+<% end -%>
 </div>
 
 <footer class="container flex mx-auto px-4 mb-24 mt-6 leading-normal border-grey-darkest pt-6 border-t">
