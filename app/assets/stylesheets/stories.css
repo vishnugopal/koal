@@ -109,14 +109,10 @@ footer {
   @apply .text-grey-darkest;
 }
 
-.flash {
-  @apply .w-full .p-3 .mb-5;
-}
-
 .flash-notice {
-  @apply .flash .bg-yellow-light .text-black;
+  @apply .w-full .p-3 .mb-5 .bg-yellow-light .text-black;
 }
 
 .flash-alert {
-  @apply .flash bg-red-light text-black;
+  @apply .w-full .p-3 .mb-5 bg-red-light text-black;
 }
