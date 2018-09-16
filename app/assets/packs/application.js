@@ -2,6 +2,7 @@ import { Application } from "stimulus";
 import { definitionsFromContext } from "stimulus/webpack-helpers";
 
 import "../images/index.js.erb";
+import "../fonts/index.js.erb";
 import "../stylesheets/index.js.erb";
 import "../javascripts/index.js";
 

@@ -1,27 +1,60 @@
 @import "./application.css";
 
+@font-face {
+  font-family: "seravek-web";
+  src: local("Seravek"), url("/fonts/Seravek.woff") format("woff");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "seravek-web";
+  src: local("Seravek Italic"), url("/fonts/Seravek-Italic.woff") format("woff");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "seravek-web";
+  src: local("Seravek Bold"), url("/fonts/Seravek-Bold.woff") format("woff");
+  font-weight: 400;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: "seravek-web";
+  src: local("Seravek Medium"), url("/fonts/Seravek-Medium.woff") format("woff");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "seravek-web";
+  src: local("Seravek Bold"), url("/fonts/Seravek-Bold.woff") format("woff");
+  font-weight: 700;
+}
+
 body {
-  @apply .font-sans .text-koal-text-dark .antialiased .leading-normal .bg-koal-light;
+  @apply .font-koal .text-koal-text-dark .antialiased  .leading-normal .bg-koal-light;
 }
 
 h1 {
-  @apply .text-4xl .mb-10 .mx-auto;
+  @apply .text-4xl .mb-10 .mx-auto .font-medium;
 }
 
 h2 {
-  @apply .font-semibold .text-3xl .mb-6;
+  @apply .font-semibold .text-3xl .mb-6 .font-medium;
 }
 
 h3 {
-  @apply .font-semibold .text-2xl .mb-6;
+  @apply .font-semibold .text-2xl .mb-6 .font-medium;
 }
 
 h4 {
-  @apply .mb-2 .text-2xl;
+  @apply .mb-2 .text-2xl .font-medium;
 }
 
 p {
-  @apply .mb-5 .text-xl;
+  @apply .mb-5 .text-xl .break-words;
+  hyphens: auto;
 }
 
 h3 + p:first-line {
