@@ -20,6 +20,9 @@ Koal curates over <%= Story.count %> stories (from <%= Author.count %> authors) 
   <li>
     <h4><%= story.name %> by <%= story.author.name %></h4>
     <p><%= story.description %></p>
+  <% if story.sensitive_content_warning -%>
+    <p>Warning: <%= story.sensitive_content_warning %></p>
+  <% end -%>
     <a href="<%= story_path(id: story.id, slug: story.slug) %>" class="button">Read</a>
   </li>
   <% unless story == @stories.last -%><hr /><% end -%>

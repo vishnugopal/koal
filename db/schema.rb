@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_15_052809) do
+ActiveRecord::Schema.define(version: 2018_10_03_130120) do
 
   create_table "authors", force: :cascade do |t|
     t.string "name"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 2018_09_15_052809) do
     t.text "series_book_title"
     t.integer "series_book_order"
     t.text "outro"
+    t.text "sensitive_content_warning"
     t.index ["author_id"], name: "index_stories_on_author_id"
   end
 
