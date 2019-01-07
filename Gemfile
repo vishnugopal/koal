@@ -9,6 +9,9 @@ gem 'rails', '~> 5.2.1'
 gem 'puma', '~> 3.11'
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
 gem 'webpacker'
+# Security vulnerability
+gem "rack", ">= 2.0.6"
+gem "loofah", ">= 2.2.3"
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'mini_racer', platforms: :ruby
 
